@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, redirect, render_template_string
+from flask import Flask, request, jsonify, render_template_string
 import openai
 import os
 from dotenv import load_dotenv
@@ -17,7 +17,7 @@ def home():
         <title>Upload Audio for Transcription</title>
         <h1>Upload Audio for Transcription</h1>
         <form action="/transcribe" method="post" enctype="multipart/form-data">
-            <input type="file" name="file">
+            <input type="file" name="file" required>
             <input type="submit" value="Upload and Transcribe">
         </form>
     ''')
@@ -25,15 +25,32 @@ def home():
 @app.route('/transcribe', methods=['POST'])
 def transcribe():
     try:
+        # Step 1: Retrieve the uploaded file from the form
         file = request.files['file']
-        response = openai.Audio.transcribe(
-            model="whisper-1",
-            file=file
-        )
-        transcription = response['text']
-        return jsonify({'transcription': transcription}), 200
+        
+        # Step 2: Open and process the file for transcription
+        with file.stream as audio_file:  # Use `file.stream` for reading directly
+            transcription_response = openai.Audio.transcribe(
+                model="whisper-1",
+                file=audio_file
+            )
+        
+        # Step 3: Extract transcription text
+        transcription = transcription_response['text']
+
+        # Step 4: Display the transcription on the web page
+        return render_template_string('''
+            <!doctype html>
+            <title>Transcription Result</title>
+            <h1>Transcription</h1>
+            <p>{{ transcription }}</p>
+            <a href="/">Upload Another File</a>
+        ''', transcription=transcription)
+    
     except openai.error.OpenAIError as e:
         return jsonify({'error': str(e)}), 500
+    except Exception as e:
+        return jsonify({'error': 'An unexpected error occurred: ' + str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
