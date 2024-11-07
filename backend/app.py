@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, redirect
 import openai
 import os
 from dotenv import load_dotenv
@@ -8,6 +8,10 @@ load_dotenv()  # Load environment variables from .env file
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return redirect('/transcribe', code=302)
 
 @app.route('/transcribe', methods=['POST'])
 def transcribe():
