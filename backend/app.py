@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, redirect, render_template_string
+from flask import Flask, request, jsonify, render_template_string
 import openai
 import os
 from dotenv import load_dotenv
@@ -24,15 +24,22 @@ def home():
 
 @app.route('/transcribe', methods=['POST'])
 def transcribe():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file uploaded'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Empty filename'}), 400
+
     try:
-        file = request.files['file']
-        response = openai.Audio.transcribe(
-            model="whisper-1",
-            file=file
+        # Use the new method for transcription
+        response = openai.Audio.create(
+            file=file,
+            model="whisper-1"
         )
         transcription = response['text']
         return jsonify({'transcription': transcription}), 200
-    except openai.error.OpenAIError as e:
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
