@@ -5,6 +5,9 @@ function Upload() {
     const [file, setFile] = useState(null);
     const [transcription, setTranscription] = useState('');
 
+    // Log the backend URL to verify it's loaded correctly
+    console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
+
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
     };
@@ -14,11 +17,15 @@ function Upload() {
         formData.append('file', file);
 
         try {
-            const response = await axios.post('http://localhost:5000/transcribe', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/transcribe`, 
+                formData, 
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
             setTranscription(response.data.transcription);
         } catch (error) {
             console.error("Error uploading file:", error);

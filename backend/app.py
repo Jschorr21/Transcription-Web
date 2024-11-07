@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template_string
+from flask_cors import CORS
 import openai
 import os
 from dotenv import load_dotenv
@@ -8,6 +9,15 @@ load_dotenv()  # Load environment variables from .env file
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
+CORS(app, resources={
+    r"/transcribe": {
+        "origins": [
+            "http://localhost:3000",
+            "http://localhost:5000",
+            "https://transcription-web-app-c2a72a351913.herokuapp.com"
+        ]
+    }
+})
 
 # Root route with an HTML form for file upload
 @app.route('/', methods=['GET'])
