@@ -36,9 +36,9 @@ dill==0.3.6
 distro==1.9.0
 docker-pycreds==0.4.0
 executing==1.2.0
-fastai==2.0.11
+fastai
 fastapi==0.97.0
-fastbook==0.0.29
+fastbook
 fastcore==1.5.29
 fastdownload==0.0.7
 fastjsonschema==2.17.1
